@@ -38,6 +38,7 @@ ENV RABBITMQ_DEBIAN_VERSION 3.6.9-1
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
 		erlang-nox erlang-mnesia erlang-public-key erlang-crypto erlang-ssl erlang-asn1 erlang-inets erlang-os-mon erlang-xmerl erlang-eldap \
+		python \
 		rabbitmq-server=$RABBITMQ_DEBIAN_VERSION \
 	&& rm -rf /var/lib/apt/lists/*
 
@@ -58,6 +59,10 @@ VOLUME /var/lib/rabbitmq
 RUN ln -sf /var/lib/rabbitmq/.erlang.cookie /root/
 
 RUN ln -sf /usr/lib/rabbitmq/lib/rabbitmq_server-$RABBITMQ_VERSION/plugins /plugins
+
+ADD rabbitmqadmin /usr/local/bin/rabbitmqadmin
+RUN chmod 755 /usr/local/bin/rabbitmqadmin
+RUN sh -c 'rabbitmqadmin --bash-completion > /etc/bash_completion.d/rabbitmqadmin'
 
 RUN rabbitmq-plugins enable --offline rabbitmq_management
 

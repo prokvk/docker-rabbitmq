@@ -1,4 +1,4 @@
-COMMON_NAME = rabbitmq
+COMMON_NAME = rabbitmq1
 HOSTNAME = my-rabbit
 
 IMAGE = $(COMMON_NAME)
@@ -8,15 +8,15 @@ PORTS = -p 5672:5672 -p 15672:15672
 VOLUMES = \
 	-v /usr/data/rabbitmq:/var/lib/rabbitmq
 
-
-.PHONY: build run stop inspect rm logs ports
+.PHONY: build run stop inspect rm logs ports up
 
 build:
 		docker build -t $(IMAGE) .
 
 # daemon only
 run:
-		docker run --rm -it $(NET) --hostname $(HOSTNAME) --name $(NAME) $(ENV_VARS) $(PORTS) $(VOLUMES) $(IMAGE)
+		# docker run --rm -it $(NET) --hostname $(HOSTNAME) --name $(NAME) $(ENV_VARS) $(PORTS) $(VOLUMES) $(IMAGE)
+		docker run -d $(NET) --hostname $(HOSTNAME) --name $(NAME) $(ENV_VARS) $(PORTS) $(VOLUMES) $(IMAGE)
 
 stop:
 		docker stop $(NAME)
@@ -33,3 +33,6 @@ logs:
 
 ports:
 		docker port $(NAME)
+
+up:
+		rsync -avz ./* /home/prokvk/dev/forpsi/docker-rabbitmq
