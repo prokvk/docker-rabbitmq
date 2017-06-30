@@ -1,22 +1,28 @@
-COMMON_NAME = rabbitmq1
-HOSTNAME = my-rabbit
+COMMON_NAME = $$IMAGENAME
 
 IMAGE = $(COMMON_NAME)
 NAME = $(COMMON_NAME)
-ENV_VARS = -e RABBITMQ_DEFAULT_VHOST="/" -e RABBITMQ_ERLANG_COOKIE="secret cookie here"
-PORTS = -p 5672:5672 -p 15672:15672
-VOLUMES = \
-	-v /usr/data/rabbitmq:/var/lib/rabbitmq
 
-.PHONY: build run stop inspect rm logs ports up
+# --user root
+# -v $$PWD/app:/usr/src/app
+# -p 80:80
+# -e "ENVVAR=1"
+# --link="mysql:mysql.ccl"
+# PARAMS = -p 80:80
+
+.PHONY: build run rund runsh stop inspect logs
 
 build:
 		docker build -t $(IMAGE) .
 
-# daemon only
 run:
-		# docker run --rm -it $(NET) --hostname $(HOSTNAME) --name $(NAME) $(ENV_VARS) $(PORTS) $(VOLUMES) $(IMAGE)
-		docker run -d $(NET) --hostname $(HOSTNAME) --name $(NAME) $(ENV_VARS) $(PORTS) $(VOLUMES) $(IMAGE)
+		docker run --rm -it --name $(NAME) $(PARAMS) $(IMAGE)
+
+rund:
+		docker run -d --name $(NAME) $(PARAMS) $(IMAGE)
+
+runsh:
+		docker run --rm -it --name $(NAME) $(PARAMS) $(IMAGE) bash
 
 stop:
 		docker stop $(NAME)
@@ -25,14 +31,5 @@ stop:
 inspect:
 		docker exec -it $(NAME) bash
 
-rm:
-		docker rm $(NAME)
-
 logs:
 		docker logs $(NAME)
-
-ports:
-		docker port $(NAME)
-
-up:
-		rsync -avz ./* /home/prokvk/dev/forpsi/docker-rabbitmq
